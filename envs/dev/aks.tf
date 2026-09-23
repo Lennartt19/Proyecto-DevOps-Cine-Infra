@@ -16,6 +16,12 @@ resource "azurerm_kubernetes_cluster" "dev" {
     type = "SystemAssigned"
   }
 
+  # Driver CSI para leer el Key Vault desde los pods (ver k8s/secret-provider.yaml).
+  # Rotación apagada a propósito: el CD reinicia los pods en cada deploy.
+  key_vault_secrets_provider {
+    secret_rotation_enabled = false
+  }
+
   tags = {
     project = var.project
     env     = var.environment

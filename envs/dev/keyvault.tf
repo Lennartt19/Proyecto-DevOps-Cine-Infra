@@ -1,0 +1,28 @@
+# Entorno DEV: Key Vault para los secretos de la app (BD, JWT).
+# Los VALORES no viven aquí: el CD los escribe desde GitHub Secrets
+# (az keyvault secret set). Terraform solo crea la caja fuerte y el permiso.
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_key_vault" "dev" {
+  name                = var.key_vault_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.dev.name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  sku_name            = var.key_vault_sku
+
+  # Permisos por RBAC de Azure (modelo actual, sin access policies).
+  rbac_authorization_enabled = true
+
+  tags = {
+    project = var.project
+    env     = var.environment
+  }
+}
+
+# El AKS (identidad kubelet) puede LEER secretos del vault. Sin esto,
+# el driver CSI de los pods falla con 403.
+resource "azurerm_role_assignment" "aks_kv_secrets_user" {
+  scope                = azurerm_key_vault.dev.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_kubernetes_cluster.dev.kubelet_identity[0].object_id
+}

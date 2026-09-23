@@ -9,3 +9,5 @@ node_count          = 1
 vm_size             = "Standard_B2s_v2"
 acr_name            = "acrcinedev01"
 acr_sku             = "Basic"
+key_vault_name      = "kvcinedev01"
+key_vault_sku       = "standard"

@@ -48,3 +48,13 @@ variable "acr_sku" {
   type        = string
   description = "SKU del ACR (Basic para dev Students)"
 }
+
+variable "key_vault_name" {
+  type        = string
+  description = "Nombre global único del Key Vault (letras, números y guiones, 3-24)"
+}
+
+variable "key_vault_sku" {
+  type        = string
+  description = "SKU del Key Vault (standard para dev)"
+}
