@@ -38,3 +38,13 @@ variable "vm_size" {
   type        = string
   description = "Tamaño de VM de los nodos"
 }
+
+variable "acr_name" {
+  type        = string
+  description = "Nombre global único del Container Registry (minúsculas y números, 5-50)"
+}
+
+variable "acr_sku" {
+  type        = string
+  description = "SKU del ACR (Basic para dev Students)"
+}
