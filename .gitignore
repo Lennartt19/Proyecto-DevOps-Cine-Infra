@@ -12,5 +12,8 @@ override.tf.json
 terraform.rc
 tfplan*
 
+# Windows copy markers (ruido al copiar desde Explorer/mnt)
+*:Zone.Identifier
+
 # Backend config con nombres reales (no secretos, pero mejor no versionar si cambian)
 # backend.hcl se versiona a propósito aquí porque solo tiene nombres, no claves.
