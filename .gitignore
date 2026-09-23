@@ -1,0 +1,16 @@
+#Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+tfplan*
+
+# Backend config con nombres reales (no secretos, pero mejor no versionar si cambian)
+# backend.hcl se versiona a propósito aquí porque solo tiene nombres, no claves.
