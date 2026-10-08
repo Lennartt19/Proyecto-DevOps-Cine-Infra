@@ -58,3 +58,9 @@ variable "key_vault_sku" {
   type        = string
   description = "SKU del Key Vault (standard para dev)"
 }
+
+variable "keyvault_admin_object_id" {
+  type        = string
+  description = "Object id del humano con acceso manual al vault (vacío = no crear). No es secreto."
+  default     = ""
+}
