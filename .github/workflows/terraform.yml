@@ -45,6 +45,41 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # Pre-chequeo bootstrap RBAC (solo apply): Terraform corre como la MI
+      # mi-github-terraform (solo Contributor) y Azure NO deja que un código se
+      # auto-otorgue roleAssignments/write. Si falta el bootstrap, se falla AQUÍ
+      # en segundos con el comando exacto, en vez de esperar 4+ min al AKS para
+      # terminar en 403. No usa Graph: el object id de la MI es estable.
+      - name: Pre-chequeo permiso para crear roles
+        if: ${{ inputs.action == 'apply' }}
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          MI_OBJECT_ID: 0667fe5a-4624-4dfe-a788-8f846e67ec72 # mi-github-terraform (ver CONTEXT.md §2)
+        run: |
+          SUB="/subscriptions/$ARM_SUBSCRIPTION_ID"
+          RG_NAME="rg-cine-${{ inputs.environment }}"
+          has_role() {
+            [ -n "$(az role assignment list --assignee "$MI_OBJECT_ID" --scope "$1" --query "[?roleDefinitionName=='User Access Administrator' || roleDefinitionName=='Owner'].roleDefinitionName" -o tsv)" ]
+          }
+          if has_role "$SUB"; then
+            echo "Bootstrap OK a nivel suscripción (sobrevive a destroys)."
+            exit 0
+          fi
+          if az group show -n "$RG_NAME" >/dev/null 2>&1; then
+            RG_ID=$(az group show -n "$RG_NAME" --query id -o tsv)
+            if has_role "$RG_ID"; then
+              echo "Bootstrap OK a nivel RG (ojo: se pierde con destroy; se recomienda a nivel suscripción)."
+              exit 0
+            fi
+          fi
+          echo "FALTA el bootstrap: la MI no puede crear role assignments y el apply fallará con 403."
+          echo "Ejecuta esto UNA vez con tu usuario dueño (a nivel suscripción sobrevive a destroys):"
+          echo ""
+          echo "  az role assignment create --assignee-object-id $MI_OBJECT_ID --assignee-principal-type ServicePrincipal --role \"User Access Administrator\" --scope \"$SUB\""
+          echo ""
+          echo "Espera 2-3 min y re-lanza el workflow."
+          exit 1
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
