@@ -6,9 +6,9 @@ Infraestructura básica en Terraform (cuenta Azure for Students).
 
 ```text
 envs/
-  dev/ (resource-group + aks + acr + keyvault)  → rg-cine-dev   (state: dev.tfstate)
-  qa/  (solo resource-group por ahora)          → rg-cine-qa    (state: qa.tfstate)
-  prod/(solo resource-group por ahora)          → rg-cine-prod  (state: prod.tfstate)
+  dev/  (resource-group + aks + acr + keyvault)  → rg-cine-dev    (state: dev.tfstate)
+  qa/   (resource-group + aks + acr + keyvault)  → rg-cine-qa     (state: qa.tfstate)
+  prod/ (resource-group + aks + acr + keyvault)  → rg-cine-prod   (state: prod.tfstate)
 .github/workflows/terraform.yml → despliegue manual desde GitHub
 ```
 
