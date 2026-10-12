@@ -39,14 +39,14 @@ variable "vm_size" {
   description = "Tamaño de VM de los nodos"
 }
 
-variable "acr_name" {
+variable "shared_acr_name" {
   type        = string
-  description = "Nombre global único del Container Registry (minúsculas y números, 5-50)"
+  description = "Nombre del ACR compartido (vive en dev, lo usan dev/qa/prod)"
 }
 
-variable "acr_sku" {
+variable "shared_acr_resource_group" {
   type        = string
-  description = "SKU del ACR (Basic para Students)"
+  description = "RG donde vive el ACR compartido (rg-cine-dev)"
 }
 
 variable "key_vault_name" {
