@@ -49,6 +49,16 @@ variable "shared_acr_resource_group" {
   description = "RG donde vive el ACR compartido (rg-cine-dev)"
 }
 
+variable "shared_cluster_name" {
+  type        = string
+  description = "Nombre del AKS compartido (vive en dev)"
+}
+
+variable "shared_cluster_resource_group" {
+  type        = string
+  description = "RG del AKS compartido (rg-cine-dev)"
+}
+
 variable "key_vault_name" {
   type        = string
   description = "Nombre global único del Key Vault (letras, números y guiones, 3-24)"

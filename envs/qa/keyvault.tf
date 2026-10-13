@@ -3,6 +3,14 @@
 # (az keyvault secret set). Terraform solo crea la caja fuerte y los permisos.
 data "azurerm_client_config" "current" {}
 
+# AKS COMPARTIDO (cupo Students: 3 IPs en chilecentral, 1 AKS+Ingress = 2).
+# qa/prod corren como namespaces (cine-qa/cine-prod) en aks-cine-dev:
+# no hay AKS propio aquí, así que los permisos van al kubelet de dev.
+data "azurerm_kubernetes_cluster" "shared" {
+  name                = var.shared_cluster_name
+  resource_group_name = var.shared_cluster_resource_group
+}
+
 resource "azurerm_key_vault" "qa" {
   name                = var.key_vault_name
   location            = var.location
@@ -19,12 +27,12 @@ resource "azurerm_key_vault" "qa" {
   }
 }
 
-# El AKS (identidad kubelet) puede LEER secretos del vault. Sin esto,
-# el driver CSI de los pods falla con 403.
+# El kubelet del AKS COMPARTIDO (dev) puede LEER secretos de este vault.
+# Sin esto, el driver CSI de los pods de cine-qa falla con 403.
 resource "azurerm_role_assignment" "aks_kv_secrets_user" {
   scope                = azurerm_key_vault.qa.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_kubernetes_cluster.qa.kubelet_identity[0].object_id
+  principal_id         = data.azurerm_kubernetes_cluster.shared.kubelet_identity[0].object_id
 }
 
 # El CD (la misma identidad que ejecuta Terraform/CI vía OIDC) puede
